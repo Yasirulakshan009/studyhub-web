@@ -53,3 +53,11 @@ api.interceptors.response.use(
 )
 
 export default api
+
+export const getErrorMessage = (error: unknown, fallback = "Something went wrong") => {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as { message?: string } | undefined
+      return data?.message ?? fallback
+    }
+    return fallback
+  }
