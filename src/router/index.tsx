@@ -4,6 +4,7 @@ import RequireAuth from "../components/common/RequireAuth"
 import LoginPage from "../pages/LoginPage"
 import RegisterPage from "../pages/RegisterPage"
 import HomePage from "../pages/HomePage"
+import BrowsePage from "../pages/BrowsePage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -19,7 +20,7 @@ export default function Router() {
       <Routes>
         <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
-          <Route path="/browse" element={<Placeholder title="Browse notes" />} />
+        <Route path="/browse" element={<BrowsePage />} />
           <Route path="/notes/:id" element={<Placeholder title="Note details" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

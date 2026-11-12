@@ -1,7 +1,8 @@
 import { Outlet } from "react-router-dom"
 import Background from "./Background"
-import Header from "./Header"
 import Footer from "./Footer"
+import Header from "./Header"
+import ScrollToTop from "./ScrollToTop"
 
 export default function MainLayout() {
   return (
@@ -14,6 +15,7 @@ export default function MainLayout() {
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   )
 }

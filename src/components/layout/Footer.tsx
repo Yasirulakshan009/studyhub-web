@@ -14,10 +14,10 @@ export default function Footer() {
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
           <div className="sm:col-span-2">
             <div className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-sm font-bold text-white">
-                S
+            <img src="/logo.png" alt="" className="h-8 w-8" />
+              <span>
+                Study<span className="text-brand">Hub</span>
               </span>
-              StudyHub
             </div>
             <p className="mt-3 max-w-sm text-sm text-slate-500 dark:text-slate-400">
               A free, moderated library where students share lecture notes and PDF resources,

@@ -6,25 +6,6 @@ import { getCategories } from "../service/category"
 import { getNotes } from "../service/note"
 import type { Category, Note } from "../types"
 
-const steps = [
-    {
-      title: "Upload your notes",
-      description:
-        "Log in and upload a PDF with a title, a short description and a category. Only share notes you own or have permission to share."
-    },
-    {
-      title: "A moderator reviews it",
-      description:
-        "Every upload is checked before it goes live. If a note is rejected you see the reason, can fix it and send it again."
-    },
-    {
-      title: "Search and download",
-      description:
-        "Find notes by keyword or category, open the one you need and download the PDF. You need to be logged in to download."
-    }
-  ]
-
-
 export default function HomePage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState("")
@@ -109,7 +90,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      <section className="pb-0 pt-10 text-center md:pt-16">
+      <section className="pb-0 pt-2 text-center md:pt-6">
         <p className="inline-flex rounded-full bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
           Free student note library
         </p>
@@ -283,36 +264,41 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
       <section aria-labelledby="how-heading" className="pt-6">
-        <h2 id="how-heading" className="text-2xl font-semibold tracking-tight">
+        <h2 id="how-heading" className="text-center text-2xl font-semibold tracking-tight">
           How it works
         </h2>
-        <p className="mt-1 text-slate-500 dark:text-slate-400">
-          Three simple steps, from your notes to everyone&apos;s revision.
+        <p className="mx-auto mt-1 max-w-xl text-center text-slate-500 dark:text-slate-400">
+          Three simple steps from sharing a note to someone else learning from it.
         </p>
 
-        <ol role="list" className="mt-6 grid gap-5 md:grid-cols-3">
-          {steps.map((step, index) => (
-            <li key={step.title} className="glass rounded-[2rem] p-6">
-              <span
-                aria-hidden="true"
-                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand text-lg font-bold text-white"
-              >
-                {index + 1}
-              </span>
-              <h3 className="mt-4 text-lg font-semibold tracking-tight">{step.title}</h3>
-              <p className="mt-1 text-slate-500 dark:text-slate-400">{step.description}</p>
-            </li>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {[
+            {
+              step: "1",
+              title: "Upload a PDF",
+              text: "Log in, pick a category and share a note you own or have permission to share."
+            },
+            {
+              step: "2",
+              title: "We review it",
+              text: "A moderator checks every upload for quality before it goes public."
+            },
+            {
+              step: "3",
+              title: "Everyone learns",
+              text: "Approved notes appear in search. Logged-in students can download them for free."
+            }
+          ].map((item) => (
+            <div key={item.step} className="glass rounded-[1.75rem] p-6">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-lg font-semibold text-white shadow-lg shadow-brand/30">
+                {item.step}
+              </div>
+              <h3 className="mt-4 text-lg font-semibold tracking-tight">{item.title}</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.text}</p>
+            </div>
           ))}
-        </ol>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link to="/upload" className="btn-primary">
-            Upload a note
-          </Link>
-          <Link to="/browse" className="font-medium text-brand hover:underline">
-            Browse notes
-          </Link>
         </div>
       </section>
     </div>

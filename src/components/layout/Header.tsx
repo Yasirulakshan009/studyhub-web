@@ -48,10 +48,10 @@ export default function Header() {
           onClick={closeMenus}
           className="flex items-center gap-2 pl-1 text-lg font-semibold tracking-tight"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-sm font-bold text-white">
-            S
+          <img src="/logo.png" alt="" className="h-9 w-9" />
+          <span>
+            Study<span className="text-brand">Hub</span>
           </span>
-          StudyHub
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
