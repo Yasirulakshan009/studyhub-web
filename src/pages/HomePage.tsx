@@ -1,7 +1,29 @@
 import { useEffect, useRef, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import EmptyState from "../components/common/EmptyState"
+import NoteCard from "../components/note/NoteCard"
 import { getCategories } from "../service/category"
-import type { Category } from "../types"
+import { getNotes } from "../service/note"
+import type { Category, Note } from "../types"
+
+const steps = [
+    {
+      title: "Upload your notes",
+      description:
+        "Log in and upload a PDF with a title, a short description and a category. Only share notes you own or have permission to share."
+    },
+    {
+      title: "A moderator reviews it",
+      description:
+        "Every upload is checked before it goes live. If a note is rejected you see the reason, can fix it and send it again."
+    },
+    {
+      title: "Search and download",
+      description:
+        "Find notes by keyword or category, open the one you need and download the PDF. You need to be logged in to download."
+    }
+  ]
+
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -13,6 +35,10 @@ export default function HomePage() {
   const [subCategories, setSubCategories] = useState<Category[]>([])
   const [loadingSubs, setLoadingSubs] = useState(false)
   const requestId = useRef(0)
+
+  const [notes, setNotes] = useState<Note[]>([])
+  const [loadingNotes, setLoadingNotes] = useState(true)
+  const [notesError, setNotesError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -26,6 +52,25 @@ export default function HomePage() {
       })
       .finally(() => {
         if (!cancelled) setLoadingCategories(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    getNotes({ limit: 6, sort: "newest" })
+      .then((data) => {
+        if (!cancelled) setNotes(data.items)
+      })
+      .catch(() => {
+        if (!cancelled) setNotesError(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingNotes(false)
       })
 
     return () => {
@@ -192,6 +237,84 @@ export default function HomePage() {
           )}
         </section>
       )}
+
+      <section aria-labelledby="latest-heading" className="pt-6">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 id="latest-heading" className="text-2xl font-semibold tracking-tight">
+              Latest notes
+            </h2>
+            <p className="mt-1 text-slate-500 dark:text-slate-400">
+              Freshly approved by our moderators.
+            </p>
+          </div>
+          <Link to="/browse" className="shrink-0 text-sm font-medium text-brand hover:underline">
+            View all
+          </Link>
+        </div>
+
+        <div className="mt-6">
+          {loadingNotes ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="glass h-64 animate-pulse rounded-[1.75rem]" />
+              ))}
+            </div>
+          ) : notesError ? (
+            <p
+              role="alert"
+              className="glass rounded-[2rem] px-6 py-8 text-center text-slate-500 dark:text-slate-400"
+            >
+              Could not load notes right now. Please try again in a moment.
+            </p>
+          ) : notes.length === 0 ? (
+            <EmptyState
+              title="No notes yet"
+              description="Be the first to share a note with other students."
+              actionLabel="Upload a note"
+              onAction={() => navigate("/upload")}
+            />
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {notes.map((note) => (
+                <NoteCard key={note._id} note={note} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      <section aria-labelledby="how-heading" className="pt-6">
+        <h2 id="how-heading" className="text-2xl font-semibold tracking-tight">
+          How it works
+        </h2>
+        <p className="mt-1 text-slate-500 dark:text-slate-400">
+          Three simple steps, from your notes to everyone&apos;s revision.
+        </p>
+
+        <ol role="list" className="mt-6 grid gap-5 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <li key={step.title} className="glass rounded-[2rem] p-6">
+              <span
+                aria-hidden="true"
+                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand text-lg font-bold text-white"
+              >
+                {index + 1}
+              </span>
+              <h3 className="mt-4 text-lg font-semibold tracking-tight">{step.title}</h3>
+              <p className="mt-1 text-slate-500 dark:text-slate-400">{step.description}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link to="/upload" className="btn-primary">
+            Upload a note
+          </Link>
+          <Link to="/browse" className="font-medium text-brand hover:underline">
+            Browse notes
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }
