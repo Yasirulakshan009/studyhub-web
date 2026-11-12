@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout"
 import RequireAuth from "../components/common/RequireAuth"
 import LoginPage from "../pages/LoginPage"
 import RegisterPage from "../pages/RegisterPage"
+import HomePage from "../pages/HomePage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -17,7 +18,7 @@ export default function Router() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Placeholder title="Home" />} />
+        <Route path="/" element={<HomePage />} />
           <Route path="/browse" element={<Placeholder title="Browse notes" />} />
           <Route path="/notes/:id" element={<Placeholder title="Note details" />} />
           <Route path="/login" element={<LoginPage />} />
