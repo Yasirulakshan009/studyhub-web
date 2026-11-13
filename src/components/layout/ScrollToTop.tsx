@@ -25,7 +25,7 @@ export default function ScrollToTop() {
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
       style={{ background: "linear-gradient(135deg, #1d5fe0 0%, #1fb5f2 100%)" }}
-      className={`fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_10px_25px_rgb(10_132_255/0.45)] transition duration-300 hover:-translate-y-1 active:scale-95 ${
+      className={`fixed bottom-28 right-4 z-40 md:bottom-6 md:right-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_10px_25px_rgb(10_132_255/0.45)] transition duration-300 hover:-translate-y-1 active:scale-95 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       }`}
     >
