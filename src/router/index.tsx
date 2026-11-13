@@ -5,6 +5,8 @@ import LoginPage from "../pages/LoginPage"
 import RegisterPage from "../pages/RegisterPage"
 import HomePage from "../pages/HomePage"
 import BrowsePage from "../pages/BrowsePage"
+import NoteDetailPage from "../pages/NoteDetailPage"
+import UploadPage from "../pages/UploadPage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -21,12 +23,12 @@ export default function Router() {
         <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/browse" element={<BrowsePage />} />
-          <Route path="/notes/:id" element={<Placeholder title="Note details" />} />
+        <Route path="/notes/:id" element={<NoteDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           <Route element={<RequireAuth />}>
-            <Route path="/upload" element={<Placeholder title="Upload a note" />} />
+          <Route path="/upload" element={<UploadPage />} />
             <Route path="/my-notes" element={<Placeholder title="My notes" />} />
             <Route path="/profile" element={<Placeholder title="Profile" />} />
           </Route>
