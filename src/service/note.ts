@@ -91,3 +91,11 @@ export const reviewNote = async (id: string, input: ReviewInput) => {
   const res = await api.put<ApiResponse<Note>>(`/admin/notes/${id}/review`, input)
   return res.data.data
 }
+
+export const getPreviewUrl = async (id: string) => {
+  const res = await api.get<ApiResponse<{ url: string; expiresInSeconds: number }>>(
+    `/notes/${id}/download`,
+    { params: { preview: "true" } }
+  )
+  return res.data.data.url
+}

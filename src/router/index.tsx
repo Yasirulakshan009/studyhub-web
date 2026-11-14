@@ -9,6 +9,9 @@ import NoteDetailPage from "../pages/NoteDetailPage"
 import UploadPage from "../pages/UploadPage"
 import MyNotesPage from "../pages/MyNotesPage"
 import EditNotePage from "../pages/EditNotePage"
+import ProfilePage from "../pages/ProfilePage"
+import AdminLayout from "../components/layout/AdminLayout"
+import AdminReviewPage from "../pages/AdminReviewPage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -33,11 +36,17 @@ export default function Router() {
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/my-notes" element={<MyNotesPage />} />
           <Route path="/my-notes/:id/edit" element={<EditNotePage />} />
-            <Route path="/profile" element={<Placeholder title="Profile" />} />
+          <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
           <Route element={<RequireAuth adminOnly />}>
-            <Route path="/admin" element={<Placeholder title="Admin" />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminReviewPage />} />
+              <Route
+                path="/admin/categories"
+                element={<Placeholder title="Categories" />}
+              />
+            </Route>
           </Route>
 
           <Route path="*" element={<Placeholder title="Page not found" />} />
