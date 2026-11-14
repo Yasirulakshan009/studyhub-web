@@ -12,6 +12,7 @@ import EditNotePage from "../pages/EditNotePage"
 import ProfilePage from "../pages/ProfilePage"
 import AdminLayout from "../components/layout/AdminLayout"
 import AdminReviewPage from "../pages/AdminReviewPage"
+import AdminCategoriesPage from "../pages/AdminCategoriesPage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -42,10 +43,7 @@ export default function Router() {
           <Route element={<RequireAuth adminOnly />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminReviewPage />} />
-              <Route
-                path="/admin/categories"
-                element={<Placeholder title="Categories" />}
-              />
+              <Route path="/admin/categories" element={<AdminCategoriesPage />} />
             </Route>
           </Route>
 
