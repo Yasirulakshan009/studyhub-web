@@ -55,6 +55,7 @@ export interface Note {
   status: NoteStatus
   rejectionReason?: string
   downloadCount: number
+  aiSummary?: string
   createdAt: string
   updatedAt: string
 }

@@ -99,3 +99,10 @@ export const getPreviewUrl = async (id: string) => {
   )
   return res.data.data.url
 }
+
+export const getSummary = async (id: string) => {
+  const res = await api.post<ApiResponse<{ summary: string; cached: boolean }>>(
+    `/notes/${id}/summary`
+  )
+  return res.data.data
+}
