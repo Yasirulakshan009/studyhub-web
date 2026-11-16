@@ -27,3 +27,13 @@ export const updateMyProfile = async (input: UpdateProfileInput) => {
   const res = await api.put<ApiResponse<User>>("/auth/me", input)
   return res.data.data
 }
+
+export const forgotPasswordRequest = async (email: string) => {
+  const res = await api.post<{ message: string }>("/auth/forgot-password", { email })
+  return res.data
+}
+
+export const resetPasswordRequest = async (token: string, newPassword: string) => {
+  const res = await api.post<{ message: string }>("/auth/reset-password", { token, newPassword })
+  return res.data
+}

@@ -13,6 +13,7 @@ import ProfilePage from "../pages/ProfilePage"
 import AdminLayout from "../components/layout/AdminLayout"
 import AdminReviewPage from "../pages/AdminReviewPage"
 import AdminCategoriesPage from "../pages/AdminCategoriesPage"
+import ForgotPasswordPage from "../pages/ForgotPasswordPage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -32,6 +33,7 @@ export default function Router() {
           <Route path="/notes/:id" element={<NoteDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           <Route element={<RequireAuth />}>
           <Route path="/upload" element={<UploadPage />} />

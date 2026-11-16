@@ -74,7 +74,7 @@ export default function RegisterPage() {
           Join StudyHub to share and download notes.
         </p>
 
-        <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-3">
           <InputField
             label="Full name"
             id="name"

@@ -21,8 +21,8 @@
   --glass-bottom: rgb(255 255 255 / 0.2);
   --shadow-soft: rgb(15 23 42 / 0.05);
   --shadow-deep: rgb(15 23 42 / 0.1);
-  --color-slate-400: #64748b;
-  --color-slate-500: #475569;
+  --color-slate-400: #475569;
+  --color-slate-500: #334155;
   --color-slate-600: #334155;
   --color-slate-700: #1e293b;
 }
@@ -118,4 +118,25 @@ body {
 
 :root.dark input::placeholder {
   color: rgb(255 255 255 / 0.5);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
 }

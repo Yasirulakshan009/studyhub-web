@@ -60,7 +60,7 @@ export default function LoginPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
         <p className="mt-1 text-slate-500 dark:text-slate-400">Log in to upload and download notes.</p>
 
-        <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-3">
           <InputField
             label="Email"
             id="email"
@@ -82,6 +82,12 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             error={fieldErrors.password}
           />
+
+          <div className="-mt-1 text-right">
+            <Link to="/forgot-password" className="text-sm font-medium text-brand hover:underline">
+              Forgot password?
+            </Link>
+          </div>
 
           {error && (
             <p
