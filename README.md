@@ -224,9 +224,9 @@ The frontend follows a component-based architecture using React.
 
 ### 3. Browse Resources
 
-![Browse Resources - First View](src/assets/screenshot/Bows%20Page1.png)
+![Browse Resources - First View](src/assets/screenshot/Brows%20Page1.png)
 
-![Browse Resources - Second View](src/assets/screenshot/Bows%20Page2.png)
+![Browse Resources - Second View](src/assets/screenshot/Brows%20Page2.png)
 
 ### 4. View Note
 
