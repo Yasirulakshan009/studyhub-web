@@ -2,110 +2,111 @@
 
 ## Overview
 
-StudyHub is a student resource-sharing platform designed to help students share, discover, and access educational resources. Users can upload PDF notes, browse available resources, preview documents, download notes, and manage their uploaded resources.
+StudyHub is a student resource-sharing platform. Students can upload PDF notes, search and browse approved resources, preview and download them, and manage their own uploads. Every upload is reviewed by an admin before it becomes public, and approved notes can be summarised with AI.
 
-The platform also provides administrative features for managing categories and reviewing uploaded notes, along with AI-powered PDF summarization.
+This repository contains the **frontend**, built with React, TypeScript and Tailwind CSS as part of the **ITS2020 – Rapid Application Development (RAD)** final coursework.
 
-This repository contains the frontend application of StudyHub, developed using React, TypeScript, and modern frontend technologies.
+## Live Demo
 
-**Academic Module:** ITS2020 – Rapid Application Development (RAD)
+| Part | URL |
+|---|---|
+| Frontend (Vercel) | `https://your-frontend.vercel.app` |
+| Backend API (Render) | `https://your-api.onrender.com/api/v1` |
+
+> The backend runs on a free Render instance that sleeps when idle. The first request after a break (for example logging in) can take up to a minute.
+
+**Backend repository:** https://github.com/Yasirulakshan009/studyhub-api
 
 ## Technologies Used
 
-- React 19
-- TypeScript
+- React and TypeScript (functional components and hooks)
 - Vite
 - Tailwind CSS
-- Redux Toolkit
-- React Redux
-- React Router DOM
+- Redux Toolkit and React Redux
+- React Router
 - Axios
 - PDF.js (`pdfjs-dist`)
 - ESLint
 
 ## Main Features
 
-### 1. User Authentication
+### 1. Authentication
+- Registration and login with form validation.
+- JWT access token with automatic refresh when it expires.
+- The session is restored when the page is reloaded.
+- Protected routes for logged-in users and admin-only routes.
+- Forgot password and reset password through an emailed link.
+- Profile page: update name and email, change password, and see upload statistics.
 
-- User registration and login
-- JWT-based authentication
-- Automatic access token refresh
-- Protected routes
-- Forgot password functionality
-- Password reset functionality
-- User profile management
-- Password change functionality
-- Form validation
+### 2. Browse and search
+- Search by title, subject or keyword.
+- Filter by category and sub-category, sort by newest, oldest, most downloaded or best match.
+- Pagination, with filters kept in the URL so links can be shared.
+- Loading, empty and error states on every data page.
 
-### 2. Note Management
+### 3. Note details, PDF preview and download
+- Note details with category, tags, uploader and download count.
+- In-app PDF preview rendered with PDF.js (no file download needed).
+- Download for logged-in users.
+- AI summary: generate a short overview and key points of an approved note. Saved summaries load instantly.
 
-- Upload PDF resources
-- Edit uploaded note details
-- View personal uploaded notes
-- Delete uploaded notes
-- Display note submission status
-- Display rejection reasons
-- Download PDF resources
+### 4. My notes
+- Upload a PDF with title, description, category, subject and tags, and confirm ownership.
+- See the status of each note (Pending, Approved, Rejected) and the rejection reason.
+- Edit, view, download and delete your own notes.
 
-### 3. Browse Resources
+### 5. Admin panel
+- Review pending notes with an in-page PDF preview.
+- Approve a note, or reject it with a reason.
+- Manage categories and sub-categories (create, edit, delete).
 
-- Browse available educational resources
-- Search notes
-- Filter notes
-- Sort notes by different criteria
-- Pagination support
-- View individual note details
+### 6. User interface
+- Responsive layout for desktop, tablet and mobile, with a bottom tab bar on small screens.
+- Light and dark theme (the choice is remembered).
+- Consistent design system built from reusable components and shared styles.
+- Accessibility: semantic HTML, labelled form fields, keyboard-friendly dropdowns and dialogs, visible focus styles and reduced-motion support.
 
-### 4. PDF Viewer
+## Pages and Access
 
-- Preview PDF documents within the application
-- View resources before downloading
-- PDF rendering using PDF.js
-
-### 5. AI-Powered Summarization
-
-- Generate AI-powered summaries for PDF resources
-- Display generated summaries within the application
-
-### 6. Admin Features
-
-- Admin dashboard
-- Category management
-- Create, update, and delete categories
-- Review pending note submissions
-- Preview uploaded PDF documents
-- Approve or reject submitted notes
-- Provide rejection reasons
-
-### 7. User Interface
-
-- Responsive design for desktop, tablet, and mobile devices
-- Light and dark theme support
-- Reusable React components
-- Form validation
-- Loading and error handling
+| Route | Page | Access |
+|---|---|---|
+| `/` | Home | Public |
+| `/browse` | Browse and search notes | Public |
+| `/notes/:id` | Note details | Public (approved notes). Preview, download and AI summary need login |
+| `/login`, `/register` | Login, register | Public |
+| `/forgot-password`, `/reset-password` | Password reset | Public |
+| `/upload` | Upload a note | Logged in |
+| `/my-notes`, `/my-notes/:id/edit` | My notes, edit a note | Logged in |
+| `/profile` | Profile and password | Logged in |
+| `/admin` | Pending note review | Admin |
+| `/admin/categories` | Category management | Admin |
 
 ## Project Structure
 
 ```text
 studyhub-web/
-├── public/
+├── public/                 # logo and favicon
 ├── src/
 │   ├── assets/
-│   │   └── screenshot/
+│   │   └── screenshot/     # README screenshots
 │   ├── components/
-│   ├── hooks/
-│   ├── pages/
-│   ├── router/
-│   ├── service/
-│   ├── store/
-│   ├── types/
+│   │   ├── common/         # Dropdown, Pagination, StatusBadge, EmptyState, dialogs
+│   │   ├── forms/          # InputField, TextAreaField, FileField
+│   │   ├── layout/         # Header, Footer, BottomNav, MainLayout, AdminLayout
+│   │   └── note/           # NoteCard, PdfViewer, AiSummaryCard
+│   ├── hooks/              # useAuth, useTheme, typed Redux hooks
+│   ├── pages/              # one file per page
+│   ├── router/             # routes and route guards
+│   ├── service/            # Axios client and API functions
+│   ├── store/              # Redux store and auth slice
+│   ├── types/              # shared TypeScript types
+│   ├── utils/              # formatting helpers
 │   ├── App.tsx
 │   └── main.tsx
 ├── .env.example
 ├── index.html
 ├── package.json
-├── tsconfig.json
+├── vercel.json             # SPA rewrite for deployment
 └── vite.config.ts
 ```
 
@@ -113,174 +114,134 @@ studyhub-web/
 
 ### Prerequisites
 
-- Node.js
-- npm
-- StudyHub Backend API
+- Node.js 20 or later and npm
+- The StudyHub backend running locally or deployed (see the [backend repository](https://github.com/Yasirulakshan009/studyhub-api))
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Yasirulakshan009/studyhub-web.git
-```
-
-### 2. Navigate to the Project Directory
-
-```bash
 cd studyhub-web
 ```
 
-### 3. Install Dependencies
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Configure Environment Variables
+### 3. Configure environment variables
 
-Create a `.env` file in the project root directory.
+Copy `.env.example` to `.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
-Update the API URL according to your backend configuration.
+Use your backend URL here. For the deployed backend use `https://your-api.onrender.com/api/v1`. Restart the dev server after changing `.env`.
 
-### 5. Run the Development Server
+### 4. Run the development server
 
 ```bash
 npm run dev
 ```
 
-The application will be available at the local URL provided by Vite, usually:
-
-```text
-http://localhost:5173
-```
+Open `http://localhost:5173`.
 
 ## Available Scripts
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Starts the development server |
-| `npm run build` | Builds the application for production |
-| `npm run preview` | Previews the production build |
-| `npm run lint` | Runs ESLint |
-
-## Backend Integration
-
-The frontend communicates with the StudyHub REST API using Axios.
-
-**Backend Repository:**
-
-https://github.com/Yasirulakshan009/studyhub-api
-
-**Local API Base URL:**
-
-```text
-http://localhost:5000/api/v1
-```
-
-The frontend integrates with API endpoints for:
-
-- Authentication and user management
-- Category management
-- Note management
-- PDF preview and downloads
-- AI-powered summaries
-- Administrative note reviews
+| `npm run dev` | Start the development server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Run ESLint |
 
 ## Architecture
 
-The frontend follows a component-based architecture using React.
+- **Components:** reusable UI building blocks shared across pages.
+- **Pages and router:** each page is a route. Guard components redirect visitors who are not logged in, and non-admins away from admin pages.
+- **Redux Toolkit:** the `auth` slice holds the logged-in user, loading and error state, and restores the session on page load. Login and session restore are async thunks.
+- **Service layer:** one Axios client adds the access token to requests and refreshes it automatically when it expires. API functions live in `service/`.
+- **Hooks:** `useAuth` exposes the current user and admin flag, `useTheme` handles the light and dark theme.
+- **Styling:** Tailwind CSS with shared custom styles (glass surfaces, primary button) so every page looks consistent.
 
-- **Components:** Reusable user interface elements.
-- **Pages:** Application pages and views.
-- **Services:** API communication using Axios.
-- **Redux Toolkit:** Centralized application state management.
-- **Router:** Client-side navigation and protected routes.
-- **Hooks:** Reusable application logic.
+## Backend Integration
+
+The frontend talks to the StudyHub REST API through Axios for authentication, categories, notes, PDF preview and download, AI summaries and admin review. See the backend README for the endpoint list.
+
+## Known Limitations
+
+- Access and refresh tokens are stored in `localStorage`. This is simple but exposed to script injection. An HttpOnly cookie would be safer for a production system.
+- Admin tools cover note review and categories. There is no statistics dashboard.
+- PDF preview shows the first 40 pages.
 
 ## Screenshots
 
-### 1. Home Page
-
+### 1. Home page
 ![Home Page](src/assets/screenshot/Home%20Page1.png)
 
 ![Home Page - Additional View](src/assets/screenshot/Home%20Page2.png)
 
-### 2. User Authentication
+### 2. Authentication
 
-**Login Page**
+**Login**
 
 ![Login Page](src/assets/screenshot/Login%20Page.png)
 
-**Registration Page**
+**Register**
 
 ![Registration Page](src/assets/screenshot/Register%20Page.png)
 
-**Forgot Password Page**
+**Forgot password**
 
 ![Forgot Password Page](src/assets/screenshot/Froget%20Password.png)
 
-### 3. Browse Resources
-
+### 3. Browse resources
 ![Browse Resources - First View](src/assets/screenshot/Brows%20Page1.png)
 
 ![Browse Resources - Second View](src/assets/screenshot/Brows%20Page2.png)
 
-### 4. View Note
-
+### 4. Note details
 ![View Note](src/assets/screenshot/View%20Note.png)
 
-### 5. PDF Preview
-
+### 5. PDF preview
 ![PDF Preview](src/assets/screenshot/Preview%20PDF.png)
 
-### 6. AI-Powered Summarization
-
+### 6. AI summary
 ![AI Summarization](src/assets/screenshot/AI%20Summerize.png)
 
-### 7. My Notes
-
+### 7. My notes
 ![My Notes](src/assets/screenshot/My%20Notes%20Page.png)
 
-### 8. Upload Resources
-
+### 8. Upload a note
 ![Upload Note](src/assets/screenshot/Upload%20Page.png)
 
-### 9. User Profile
-
+### 9. Profile
 ![User Profile](src/assets/screenshot/Profile%20Page.png)
 
-### 10. Admin Dashboard
+### 10. Admin panel
 
-**Pending Note Reviews**
+**Pending note review**
 
-![Admin Dashboard](src/assets/screenshot/Admin%20Page1.png)
+![Admin Review](src/assets/screenshot/Admin%20Page1.png)
 
-**Category Management**
+**Category management**
 
 ![Category Management](src/assets/screenshot/Admin%20Page2.png)
 
-### 11. Dark Mode
-
+### 11. Dark mode
 ![Dark Mode](src/assets/screenshot/Dark%20Mood.png)
 
-### 12. Responsive Design
+### 12. Responsive design
 
-**Mobile View**
+**Mobile**
 
 ![Mobile Responsive Design](src/assets/screenshot/Mobile%20Responsive.png)
 
-**Tablet View**
+**Tablet**
 
 ![Tablet Responsive Design](src/assets/screenshot/Tablet%20Responsive.png)
-
-## Related Repository
-
-**StudyHub Backend API:**
-
-https://github.com/Yasirulakshan009/studyhub-api
 
 ## Developer
 
