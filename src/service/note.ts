@@ -106,3 +106,24 @@ export const getSummary = async (id: string) => {
   )
   return res.data.data
 }
+
+
+export interface LikeResponse {
+  noteId: string
+  isLiked: boolean
+  totalLikes: number
+}
+
+export const toggleNoteLike = async (noteId: string) => {
+  const res = await api.post<ApiResponse<LikeResponse>>(
+    `/likes/${noteId}/toggle`
+  )
+  return res.data.data
+}
+
+export const getNoteLikeStatus = async (noteId: string) => {
+  const res = await api.get<ApiResponse<LikeResponse>>(
+    `/likes/${noteId}`
+  )
+  return res.data.data
+}

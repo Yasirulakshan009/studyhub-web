@@ -86,6 +86,40 @@ export default function PublicProfilePage() {
     ? "Administrator"
     : "Student"
 
+
+  const handleNoteLikeChange = (
+    noteId: string,
+    isLiked: boolean,
+    totalLikes: number
+  ) => {
+    setProfile((current) => {
+      if (!current) return current
+
+      const previousNote = current.notes.items.find(
+        (note) => note._id === noteId
+      )
+
+      const previousLikes = previousNote?.totalLikes ?? 0
+      const difference = totalLikes - previousLikes
+
+      return {
+        ...current,
+        user: {
+          ...current.user,
+          totalLikes: Math.max(0, current.user.totalLikes + difference)
+        },
+        notes: {
+          ...current.notes,
+          items: current.notes.items.map((note) =>
+            note._id === noteId
+              ? { ...note, isLiked, totalLikes }
+              : note
+          )
+        }
+      }
+    })
+  }
+
   return (
     <div className="space-y-8">
       <section className="glass rounded-[2rem] px-6 py-10 text-center sm:px-10">
@@ -107,9 +141,23 @@ export default function PublicProfilePage() {
           {user.name}
         </h1>
 
-        <span className="mt-3 inline-flex rounded-full bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand">
-          {displayRole}
-        </span>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <span className="inline-flex rounded-full bg-brand/10 px-4 py-1.5 text-xs font-semibold text-brand">
+            {displayRole}
+          </span>
+
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-4 py-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-4 w-4"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+            {user.totalLikes} Likes
+          </span>
+        </div>
       </section>
 
       <section aria-labelledby="shared-notes-heading">
@@ -152,7 +200,11 @@ export default function PublicProfilePage() {
           <>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {notes.items.map((note) => (
-                <NoteCard key={note._id} note={note} />
+                <NoteCard
+                key={note._id}
+                note={note}
+                onLikeChange={handleNoteLikeChange}
+              />
               ))}
             </div>
 

@@ -1,17 +1,33 @@
 
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import type { Note } from "../../types"
 import { useAuth } from "../../hooks/useAuth"
 import { formatDate, formatSize, refName } from "../../utils/format"
 import StatusBadge from "../common/StatusBadge"
+import { toggleNoteLike } from "../../service/note"
 
 interface NoteCardProps {
   note: Note
   showStatus?: boolean
+  onLikeChange?: (noteId: string, isLiked: boolean, totalLikes: number) => void
 }
 
-export default function NoteCard({ note, showStatus = false }: NoteCardProps) {
+export default function NoteCard({
+  note,
+  showStatus = false,
+  onLikeChange
+}: NoteCardProps) {
   const { user: currentUser } = useAuth()
+
+  const [isLiked, setIsLiked] = useState(note.isLiked ?? false)
+  const [totalLikes, setTotalLikes] = useState(note.totalLikes ?? 0)
+  const [likeLoading, setLikeLoading] = useState(false)
+
+  useEffect(() => {
+    setIsLiked(note.isLiked ?? false)
+    setTotalLikes(note.totalLikes ?? 0)
+  }, [note.isLiked, note.totalLikes])
 
   const category = refName(note.categoryId)
   const uploader = refName(note.uploaderId)
@@ -31,9 +47,31 @@ export default function NoteCard({ note, showStatus = false }: NoteCardProps) {
       ? "/profile"
       : `/users/${uploaderId}`
 
+  const handleLike = async () => {
+    if (!currentUser || likeLoading) return
+
+    try {
+      setLikeLoading(true)
+
+      const result = await toggleNoteLike(note._id)
+
+      setIsLiked(result.isLiked)
+      setTotalLikes(result.totalLikes)
+
+      onLikeChange?.(
+        note._id,
+        result.isLiked,
+        result.totalLikes
+      )
+    } catch (error) {
+      console.error("Like update failed:", error)
+    } finally {
+      setLikeLoading(false)
+    }
+  }
+
   return (
     <div className="glass group relative flex h-full flex-col rounded-[1.75rem] p-5 transition duration-200 hover:-translate-y-1">
-
       <Link
         to={`/notes/${note._id}`}
         aria-label={`View note: ${note.title}`}
@@ -41,13 +79,35 @@ export default function NoteCard({ note, showStatus = false }: NoteCardProps) {
       />
 
       <div className="pointer-events-none relative z-10 flex h-full flex-col">
-
         <div className="flex items-start justify-between gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand/10 text-xs font-bold text-brand">
             PDF
           </div>
 
-          {showStatus && <StatusBadge status={note.status} />}
+          <div className="pointer-events-auto relative z-20 flex items-center gap-2">
+            {showStatus && <StatusBadge status={note.status} />}
+
+            {note.status === "APPROVED" && (
+              <button
+                type="button"
+                onClick={handleLike}
+                disabled={!currentUser || likeLoading}
+                aria-label={isLiked ? "Unlike note" : "Like note"}
+                aria-pressed={isLiked}
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                  isLiked
+                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                    : "text-blue-600 hover:bg-blue-500/10 dark:text-blue-400"
+                }`}
+              >
+                <span className="text-xl leading-none">
+                  {isLiked ? "♥" : "♡"}
+                </span>
+                <span>{totalLikes}</span>
+                {isLiked && <span className="text-xs">Liked</span>}
+              </button>
+            )}
+          </div>
         </div>
 
         <h3 className="mt-4 line-clamp-2 text-lg font-semibold leading-snug tracking-tight">
@@ -63,9 +123,7 @@ export default function NoteCard({ note, showStatus = false }: NoteCardProps) {
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-300/40 pt-3 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400">
-
           <div className="flex min-w-0 items-center gap-2">
-
             {uploaderId ? (
               <Link
                 to={profileLink}
@@ -110,7 +168,6 @@ export default function NoteCard({ note, showStatus = false }: NoteCardProps) {
             {note.file ? `${formatSize(note.file.sizeBytes)} · ` : ""}
             {note.downloadCount} downloads
           </span>
-
         </div>
       </div>
     </div>

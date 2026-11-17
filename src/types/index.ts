@@ -44,6 +44,7 @@ export interface NoteFile {
   sizeBytes: number
 }
 
+
 export interface Note {
   _id: string
   title: string
@@ -56,12 +57,18 @@ export interface Note {
   status: NoteStatus
   rejectionReason?: string
   downloadCount: number
+  totalLikes?: number
+  isLiked?: boolean
   aiSummary?: string
   createdAt: string
   updatedAt: string
 }
 
+
+
 export interface PublicProfileResponse {
-  user: Omit<User, "email">
+  user: Omit<User, "email"> & {
+    totalLikes: number
+  }
   notes: Paginated<Note>
 }

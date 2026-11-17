@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type FormEvent } from "react"
 import AvatarEditor from "../components/common/AvatarEditor"
 import LoadingSpinner from "../components/common/LoadingSpinner"
@@ -245,7 +244,6 @@ export default function ProfilePage() {
     }
   }
 
-  // Register another Admin
   const handleAdminRegistration = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -273,8 +271,8 @@ export default function ProfilePage() {
     }
 
     if (adminPassword !== adminConfirmPassword) {
-        setAdminError("Passwords do not match.")
-        return
+      setAdminError("Passwords do not match.")
+      return
     }
 
     setRegisteringAdmin(true)
@@ -321,6 +319,11 @@ export default function ProfilePage() {
   const pendingNotes = notes.filter((note) => note.status === "PENDING").length
   const rejectedNotes = notes.filter((note) => note.status === "REJECTED").length
 
+  const totalLikes = notes.reduce(
+    (total, note) => total + (note.totalLikes ?? 0),
+    0
+  )
+
   return (
     <div className="space-y-6">
       <section className={cardClass}>
@@ -331,15 +334,29 @@ export default function ProfilePage() {
             <h1 className="truncate text-2xl font-bold tracking-tight">{profile.name}</h1>
             <p className={`mt-1 truncate text-sm ${mutedClass}`}>{profile.email}</p>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              {profile.roles.map((role) => (
-                <span
-                  key={role}
-                  className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap gap-2">
+                {profile.roles.map((role) => (
+                  <span
+                    key={role}
+                    className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand"
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-4 w-4"
                 >
-                  {role}
-                </span>
-              ))}
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                {totalLikes} Likes
+              </span>
             </div>
           </div>
 
@@ -600,7 +617,7 @@ export default function ProfilePage() {
                 autoComplete="new-password"
               />
 
-                <InputField
+              <InputField
                 label="Confirm password"
                 id="admin-confirm-password"
                 type="password"
@@ -608,7 +625,7 @@ export default function ProfilePage() {
                 onChange={(event) => setAdminConfirmPassword(event.target.value)}
                 placeholder="Re-enter admin password"
                 autoComplete="new-password"
-                />
+              />
             </div>
 
             <div className="border-t border-slate-300/50 pt-5 dark:border-white/10">

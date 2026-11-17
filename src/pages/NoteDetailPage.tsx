@@ -8,7 +8,7 @@ import AiSummaryCard from "../components/note/AiSummaryCard"
 import PdfViewer from "../components/note/PdfViewer"
 import { useAuth } from "../hooks/useAuth"
 import { getErrorMessage } from "../service/api"
-import { getDownloadUrl, getNoteById } from "../service/note"
+import { getDownloadUrl, getNoteById, toggleNoteLike } from "../service/note"
 import type { Note } from "../types"
 import { formatDate, formatSize, refName } from "../utils/format"
 
@@ -30,13 +30,20 @@ export default function NoteDetailPage() {
   const [downloadError, setDownloadError] = useState<string | null>(null)
   const [extraDownloads, setExtraDownloads] = useState(0)
   const [showPreview, setShowPreview] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const [totalLikes, setTotalLikes] = useState(0)
+  const [likeLoading, setLikeLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     getNoteById(id)
       .then((note) => {
-        if (!cancelled) setResult({ id, note, notFound: false })
+        if (!cancelled) {
+          setResult({ id, note, notFound: false })
+          setIsLiked(note.isLiked ?? false)
+          setTotalLikes(note.totalLikes ?? 0)
+        }
       })
       .catch((error) => {
         const notFound = axios.isAxiosError(error) && error.response?.status === 404
@@ -47,6 +54,23 @@ export default function NoteDetailPage() {
       cancelled = true
     }
   }, [id])
+
+  const handleLike = async () => {
+    if (!user || likeLoading) return
+
+    try {
+      setLikeLoading(true)
+
+      const response = await toggleNoteLike(id)
+
+      setIsLiked(response.isLiked)
+      setTotalLikes(response.totalLikes)
+    } catch (error) {
+      console.error("Like update failed:", error)
+    } finally {
+      setLikeLoading(false)
+    }
+  }
 
   const handleDownload = async () => {
     setDownloading(true)
@@ -148,9 +172,28 @@ export default function NoteDetailPage() {
             </p>
           )}
 
-          <h1 className="mt-4 break-words text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {note.title}
-          </h1>
+          <div className="mt-4 flex items-start justify-between gap-4">
+            <h1 className="min-w-0 break-words text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              {note.title}
+            </h1>
+
+            {note.status === "APPROVED" && (
+              <button
+                type="button"
+                onClick={handleLike}
+                disabled={!user || likeLoading}
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                  isLiked
+                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                    : "bg-slate-500/10 text-slate-500 hover:bg-blue-500/10 hover:text-blue-600"
+                } disabled:cursor-not-allowed disabled:opacity-60`}
+              >
+                <span className="text-xl">{isLiked ? "♥" : "♡"}</span>
+                {likeLoading ? "Updating..." : isLiked ? "Liked" : "Like"}
+                <span>· {totalLikes}</span>
+              </button>
+            )}
+          </div>
 
           <div className="mt-3 flex items-center gap-3">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-brand/10 dark:border-white/10">
@@ -222,6 +265,10 @@ export default function NoteDetailPage() {
             <div className="flex justify-between gap-4">
               <dt className="text-slate-500 dark:text-slate-400">Downloads</dt>
               <dd className="font-medium">{note.downloadCount + extraDownloads}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-slate-500 dark:text-slate-400">Likes</dt>
+              <dd className="font-medium">{totalLikes}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-slate-500 dark:text-slate-400">Uploaded</dt>
