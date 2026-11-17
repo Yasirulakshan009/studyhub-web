@@ -1,23 +1,27 @@
 
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import LoadingSpinner from "../components/common/LoadingSpinner"
 import EmptyState from "../components/common/EmptyState"
 import Pagination from "../components/common/Pagination"
 import NoteCard from "../components/note/NoteCard"
-import { getErrorMessage } from "../service/api"
+import api, { getErrorMessage } from "../service/api"
 import { getPublicProfile } from "../service/user"
+import { useAuth } from "../hooks/useAuth"
 import type { PublicProfileResponse } from "../types"
 
 const PAGE_SIZE = 12
 
 export default function PublicProfilePage() {
   const { userId } = useParams<{ userId: string }>()
+  const navigate = useNavigate()
+  const { user: currentUser } = useAuth()
 
   const [profile, setProfile] = useState<PublicProfileResponse | null>(null)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [startingChat, setStartingChat] = useState(false)
 
   useEffect(() => {
     if (!userId) {
@@ -86,6 +90,28 @@ export default function PublicProfilePage() {
     ? "Administrator"
     : "Student"
 
+  const handleStartChat = async () => {
+    if (!user?.id || startingChat) return
+
+    try {
+      setStartingChat(true)
+      setError("")
+
+      const response = await api.post("/chat/conversations", {
+        otherUserId: user.id,
+      })
+
+      const conversationId = response.data.data._id
+
+      navigate("/chat", {
+        state: { conversationId },
+      })
+    } catch (err) {
+      setError(getErrorMessage(err, "Could not start conversation."))
+    } finally {
+      setStartingChat(false)
+    }
+  }
 
   const handleNoteLikeChange = (
     noteId: string,
@@ -158,6 +184,18 @@ export default function PublicProfilePage() {
             {user.totalLikes} Likes
           </span>
         </div>
+
+        {currentUser && currentUser.id !== user.id && (
+          <button
+            type="button"
+            onClick={handleStartChat}
+            disabled={startingChat}
+            className="btn-primary mt-6 inline-flex items-center gap-2 disabled:opacity-50"
+          >
+            <span>💬</span>
+            {startingChat ? "Opening chat..." : "Message"}
+          </button>
+        )}
       </section>
 
       <section aria-labelledby="shared-notes-heading">
@@ -201,10 +239,10 @@ export default function PublicProfilePage() {
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {notes.items.map((note) => (
                 <NoteCard
-                key={note._id}
-                note={note}
-                onLikeChange={handleNoteLikeChange}
-              />
+                  key={note._id}
+                  note={note}
+                  onLikeChange={handleNoteLikeChange}
+                />
               ))}
             </div>
 
