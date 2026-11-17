@@ -51,7 +51,7 @@ export interface Note {
   subject?: string
   tags: string[]
   categoryId: string | { _id: string; name: string }
-  uploaderId: string | { _id: string; name: string }
+  uploaderId: string | {_id: string; name: string; avatarUrl?: string | null}
   file?: NoteFile
   status: NoteStatus
   rejectionReason?: string
@@ -59,4 +59,9 @@ export interface Note {
   aiSummary?: string
   createdAt: string
   updatedAt: string
+}
+
+export interface PublicProfileResponse {
+  user: Omit<User, "email">
+  notes: Paginated<Note>
 }

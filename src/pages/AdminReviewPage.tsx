@@ -273,6 +273,10 @@ export default function AdminReviewPage() {
               {notes.map((note) => {
                 const category = refName(note.categoryId)
                 const uploader = refName(note.uploaderId)
+
+                const uploaderAvatar =
+                  typeof note.uploaderId === "object" ? note.uploaderId.avatarUrl : null
+
                 const previewing = previewId === note._id
 
                 return (
@@ -287,17 +291,37 @@ export default function AdminReviewPage() {
                           {note.title}
                         </h2>
 
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full border border-white/70 bg-brand/10 dark:border-white/10">
+                            {uploaderAvatar ? (
+                              <img
+                                src={uploaderAvatar}
+                                alt={uploader}
+                                className="h-full w-full object-cover object-top"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-brand">
+                                {uploader?.charAt(0).toUpperCase() || "U"}
+                              </div>
+                            )}
+                          </div>
+
+                          <span className="truncate text-sm text-slate-500 dark:text-slate-400">
+                            {uploader ? `By ${uploader}` : ""}
+                          </span>
+                        </div>
+
+                        <span className="text-sm text-slate-500 dark:text-slate-400">
                           {[
-                            uploader && `By ${uploader}`,
                             category,
                             formatDate(note.createdAt),
                             note.file ? formatSize(note.file.sizeBytes) : ""
                           ]
                             .filter(Boolean)
                             .join(" · ")}
-                        </p>
-
+                        </span>
+                      </div>
                         <p className="mt-3 line-clamp-3 whitespace-pre-line break-words text-sm">
                           {note.description}
                         </p>

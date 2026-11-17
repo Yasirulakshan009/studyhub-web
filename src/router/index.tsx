@@ -15,6 +15,7 @@ import AdminReviewPage from "../pages/AdminReviewPage"
 import AdminCategoriesPage from "../pages/AdminCategoriesPage"
 import ForgotPasswordPage from "../pages/ForgotPasswordPage"
 import ResetPasswordPage from "../pages/ResetPasswordPage"
+import PublicProfilePage from "../pages/PublicProfilePage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -42,6 +43,7 @@ export default function Router() {
           <Route path="/my-notes" element={<MyNotesPage />} />
           <Route path="/my-notes/:id/edit" element={<EditNotePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/users/:userId" element={<PublicProfilePage />} />
           </Route>
 
           <Route element={<RequireAuth adminOnly />}>

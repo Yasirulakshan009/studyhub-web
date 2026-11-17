@@ -1,3 +1,4 @@
+
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
@@ -99,6 +100,9 @@ export default function NoteDetailPage() {
   const category = refName(note.categoryId)
   const uploader = refName(note.uploaderId)
 
+  const uploaderAvatar =
+    typeof note.uploaderId === "object" ? note.uploaderId.avatarUrl : null
+
   return (
     <div>
       <Link
@@ -148,11 +152,27 @@ export default function NoteDetailPage() {
             {note.title}
           </h1>
 
-          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
-            {[uploader && `Shared by ${uploader}`, formatDate(note.createdAt)]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-brand/10 dark:border-white/10">
+              {uploaderAvatar ? (
+                <img
+                  src={uploaderAvatar}
+                  alt={uploader}
+                  className="h-full w-full object-cover object-top"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-brand">
+                  {uploader?.charAt(0).toUpperCase() || "U"}
+                </div>
+              )}
+            </div>
+
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {[uploader && `Shared by ${uploader}`, formatDate(note.createdAt)]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          </div>
 
           <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             About this note
