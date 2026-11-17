@@ -16,6 +16,7 @@ import AdminCategoriesPage from "../pages/AdminCategoriesPage"
 import ForgotPasswordPage from "../pages/ForgotPasswordPage"
 import ResetPasswordPage from "../pages/ResetPasswordPage"
 import PublicProfilePage from "../pages/PublicProfilePage"
+import ChatPage from "../pages/ChatPage"
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -44,6 +45,7 @@ export default function Router() {
           <Route path="/my-notes/:id/edit" element={<EditNotePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/users/:userId" element={<PublicProfilePage />} />
+          <Route path="/chat" element={<ChatPage />} />
           </Route>
 
           <Route element={<RequireAuth adminOnly />}>

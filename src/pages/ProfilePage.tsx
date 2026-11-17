@@ -330,11 +330,11 @@ export default function ProfilePage() {
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
           <AvatarEditor user={profile} onChange={handleAvatarChange} />
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 text-center sm:text-left">
             <h1 className="truncate text-2xl font-bold tracking-tight">{profile.name}</h1>
             <p className={`mt-1 truncate text-sm ${mutedClass}`}>{profile.email}</p>
 
-            <div className="mt-3 flex flex-wrap items-center gap-3">
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
               <div className="flex flex-wrap gap-2">
                 {profile.roles.map((role) => (
                   <span
@@ -360,7 +360,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className={`${raisedClass} self-start px-5 py-3 sm:self-center`}>
+          <div className={`${raisedClass} self-center px-5 py-3`}>
             <p className={`text-xs ${mutedClass}`}>Account type</p>
             <p className="mt-0.5 text-base font-semibold">
               {isAdmin ? "Administrator" : "Student"}

@@ -4,6 +4,7 @@ import BottomNav from "./BottomNav"
 import Footer from "./Footer"
 import Header from "./Header"
 import ScrollToTop from "./ScrollToTop"
+import ChatFloatingButton from "./ChatFloatingButton"
 
 export default function MainLayout() {
   return (
@@ -17,6 +18,7 @@ export default function MainLayout() {
       </main>
       <Footer />
       <ScrollToTop />
+      <ChatFloatingButton />
       <BottomNav />
     </div>
   )
