@@ -1,5 +1,6 @@
 
 import { useEffect, useState, type FormEvent } from "react"
+import AvatarEditor from "../components/common/AvatarEditor"
 import LoadingSpinner from "../components/common/LoadingSpinner"
 import InputField from "../components/forms/InputField"
 import { useAppDispatch } from "../hooks/redux"
@@ -23,28 +24,6 @@ const errorClass = "rounded-2xl bg-red-500/10 px-4 py-3 text-sm text-red-600 dar
 
 const raisedClass =
   "rounded-3xl border border-white/80 bg-gradient-to-b from-white/85 to-white/45 shadow-[inset_0_1px_0_rgb(255_255_255/0.95),0_1px_2px_rgb(15_23_42/0.05),0_14px_32px_rgb(15_23_42/0.13)] transition duration-200 hover:-translate-y-1 dark:border-white/15 dark:from-white/15 dark:to-white/5 dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_14px_32px_rgb(0_0_0/0.45)]"
-
-function getInitials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-}
-
-function Avatar({ name }: { name: string }) {
-  return (
-    <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/80 bg-gradient-to-br from-white/90 via-sky-100/70 to-sky-300/50 text-2xl font-semibold text-brand shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-12px_18px_rgb(10_132_255/0.14),0_12px_28px_rgb(10_132_255/0.3)] dark:border-white/25 dark:from-white/30 dark:via-sky-300/15 dark:to-sky-500/30 dark:text-white">
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-3 top-1 h-6 rounded-full bg-gradient-to-b from-white/90 to-white/0 dark:from-white/40"
-      />
-      <span className="relative">{getInitials(name)}</span>
-    </div>
-  )
-}
 
 function StatTile({ label, value }: { label: string; value: number }) {
   return (
@@ -133,6 +112,11 @@ export default function ProfilePage() {
       mounted = false
     }
   }, [dispatch])
+
+  const handleAvatarChange = (updated: User) => {
+    setProfile(updated)
+    dispatch(setUser(updated))
+  }
 
   const handleEditProfile = () => {
     if (!profile) return
@@ -341,7 +325,7 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <section className={cardClass}>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <Avatar name={profile.name} />
+          <AvatarEditor user={profile} onChange={handleAvatarChange} />
 
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-bold tracking-tight">{profile.name}</h1>

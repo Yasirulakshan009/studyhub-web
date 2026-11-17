@@ -5,6 +5,7 @@ export interface User {
   name: string
   email: string
   roles: UserRole[]
+  avatarUrl?: string | null
 }
 
 export interface ApiResponse<T> {

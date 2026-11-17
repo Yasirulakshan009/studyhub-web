@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { useAppDispatch } from "../../hooks/redux"
@@ -20,7 +21,7 @@ const orbBase =
 
 const themeOrb = `${orbBase} bg-gradient-to-br from-white/90 via-white/60 to-sky-200/40 text-slate-700 shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-8px_12px_rgb(15_23_42/0.06),0_6px_16px_rgb(15_23_42/0.14)] dark:from-white/25 dark:via-white/10 dark:to-sky-400/20 dark:text-white dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-8px_12px_rgb(0_0_0/0.2),0_6px_16px_rgb(0_0_0/0.45)]`
 
-const avatarOrb = `${orbBase} bg-gradient-to-br from-white/90 via-sky-100/70 to-sky-300/50 text-sm font-semibold text-brand shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-8px_12px_rgb(10_132_255/0.14),0_8px_20px_rgb(10_132_255/0.3)] dark:from-white/30 dark:via-sky-300/15 dark:to-sky-500/30 dark:text-white dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-8px_12px_rgb(10_132_255/0.25),0_8px_20px_rgb(0_0_0/0.45)]`
+const avatarOrb = `${orbBase} !h-8 !w-8 shrink-0 bg-gradient-to-br from-white/90 via-sky-100/70 to-sky-300/50 text-xs font-semibold text-brand shadow-[inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-8px_12px_rgb(10_132_255/0.14),0_4px_10px_rgb(10_132_255/0.2)] dark:from-white/30 dark:via-sky-300/15 dark:to-sky-500/30 dark:text-white dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.4),inset_0_-8px_12px_rgb(10_132_255/0.25),0_4px_10px_rgb(0_0_0/0.3)]`
 
 function Gloss() {
   return (
@@ -80,12 +81,14 @@ export default function Header() {
     const onPointerDown = (e: PointerEvent) => {
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false)
     }
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false)
     }
 
     document.addEventListener("pointerdown", onPointerDown)
     document.addEventListener("keydown", onKeyDown)
+
     return () => {
       document.removeEventListener("pointerdown", onPointerDown)
       document.removeEventListener("keydown", onKeyDown)
@@ -93,6 +96,12 @@ export default function Header() {
   }, [open])
 
   const handleLogout = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to log out?"
+    )
+
+    if (!confirmed) return
+
     dispatch(logout())
     setOpen(false)
     navigate("/")
@@ -103,7 +112,7 @@ export default function Header() {
       <div className="relative mx-auto max-w-6xl">
         <nav
           aria-label="Main"
-          className="glass flex items-center justify-between rounded-full px-3 py-2"
+          className="glass flex items-center justify-between rounded-full px-4 py-1"
         >
           <Link
             to="/"
@@ -120,12 +129,15 @@ export default function Header() {
             <NavLink to="/" end className={navLinkClass}>
               Home
             </NavLink>
+
             <NavLink to="/browse" className={navLinkClass}>
               Browse
             </NavLink>
+
             <NavLink to="/upload" className={navLinkClass}>
               Upload
             </NavLink>
+
             {user && (
               <NavLink to="/my-notes" className={navLinkClass}>
                 My Notes
@@ -137,7 +149,11 @@ export default function Header() {
             <button
               type="button"
               onClick={toggleTheme}
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
               className={themeOrb}
             >
               <Gloss />
@@ -151,13 +167,59 @@ export default function Header() {
                 aria-haspopup="menu"
                 aria-expanded={open}
                 aria-label="Account menu"
-                className={avatarOrb}
+                className="flex items-center gap-2 rounded-xl px-1.5 py-1 transition hover:bg-white/40 dark:hover:bg-white/10"
               >
-                <Gloss />
-                <span className="relative">{user.name.charAt(0).toUpperCase()}</span>
+                <span className="hidden min-w-0 flex-col items-end text-right sm:flex">
+                  <span className="max-w-32 truncate text-xs font-semibold text-slate-800 dark:text-white">
+                    {user.name}
+                  </span>
+
+                  <span className="mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#007AFF] dark:text-[#0A84FF]">
+                    {isAdmin ? "Admin" : "Student"}
+                  </span>
+                </span>
+
+                <span className="flex items-center gap-1 rounded-full border-2 border-slate-300/80 bg-white/40 p-1 shadow-sm transition hover:border-[#007AFF]/50 dark:border-white/30 dark:bg-white/5 dark:hover:border-[#0A84FF]/50">
+                  <span className={avatarOrb}>
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt=""
+                        className="absolute inset-0 h-full w-full rounded-full object-cover object-top"
+                      />
+                    ) : (
+                      <>
+                        <Gloss />
+                        <span className="relative">
+                          {user.name.charAt(0).toUpperCase()}
+                        </span>
+                      </>
+                    )}
+                  </span>
+
+                  <span className="flex h-8 w-5 shrink-0 items-center justify-center">
+                    <svg
+                      className={`h-3.5 w-3.5 text-slate-500 transition-transform duration-200 dark:text-slate-300 ${
+                        open ? "rotate-180" : ""
+                      }`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </span>
+                </span>
               </button>
             ) : (
-              <Link to="/login" className="btn-primary px-4! py-1.5! text-sm">
+              <Link
+                to="/login"
+                className="btn-primary px-4! py-1.5! text-sm"
+              >
                 Log in
               </Link>
             )}
@@ -165,16 +227,32 @@ export default function Header() {
         </nav>
 
         {user && open && (
-          <div role="menu" className="glass absolute right-0 top-full z-10 mt-3 w-52 rounded-3xl p-2">
-            <Link to="/profile" role="menuitem" className={itemClass} onClick={() => setOpen(false)}>
+          <div
+            role="menu"
+            className="glass absolute right-0 top-full z-10 mt-3 w-52 rounded-3xl p-2"
+          >
+            <Link
+              to="/profile"
+              role="menuitem"
+              className={itemClass}
+              onClick={() => setOpen(false)}
+            >
               Profile
             </Link>
+
             {isAdmin && (
-              <Link to="/admin" role="menuitem" className={itemClass} onClick={() => setOpen(false)}>
+              <Link
+                to="/admin"
+                role="menuitem"
+                className={itemClass}
+                onClick={() => setOpen(false)}
+              >
                 Admin
               </Link>
             )}
+
             <div className="mx-2 my-1 border-t border-slate-300/50 dark:border-white/10" />
+
             <button
               type="button"
               role="menuitem"
