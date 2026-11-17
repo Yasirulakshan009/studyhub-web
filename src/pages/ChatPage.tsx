@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import api, { getErrorMessage } from "../service/api"
 import { createChatSocket } from "../service/socket"
 import { useAuth } from "../hooks/useAuth"
@@ -31,7 +31,9 @@ interface ChatMessage {
 }
 
 export default function ChatPage() {
-  const { user } = useAuth()
+    const { user } = useAuth()
+    const location = useLocation()
+    const navigate = useNavigate()
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -69,6 +71,21 @@ export default function ChatPage() {
   useEffect(() => {
     fetchConversations()
   }, [])
+
+  useEffect(() => {
+    const state = location.state as {
+      conversationId?: string
+    } | null
+  
+    if (state?.conversationId) {
+      setSelectedId(state.conversationId)
+  
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      })
+    }
+  }, [location.state, location.pathname, navigate])
 
   useEffect(() => {
     if (!selectedId) {
