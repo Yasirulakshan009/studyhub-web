@@ -89,9 +89,10 @@ export default function ChatPage() {
     fetchConversations()
   }, [])
 
-  // Open conversation on mobile: lock the page behind it so only the message list scrolls
   useEffect(() => {
-    if (!fullScreen) return
+    if (!isMobile) return
+
+    window.scrollTo(0, 0)
 
     const html = document.documentElement
     const previousHtmlOverflow = html.style.overflow
@@ -104,9 +105,8 @@ export default function ChatPage() {
       html.style.overflow = previousHtmlOverflow
       document.body.style.overflow = previousBodyOverflow
     }
-  }, [fullScreen])
+  }, [isMobile])
 
-  // Mobile conversation list: fill the space between the box top and the bottom nav
   useEffect(() => {
     if (!isMobile || selectedId !== null) {
       setListHeight(null)
@@ -289,7 +289,6 @@ export default function ChatPage() {
     })
   }, [messages])
 
-  // Keyboard opened/closed: keep the latest message visible (like WhatsApp)
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" })
   }, [viewport?.height])
@@ -723,6 +722,8 @@ export default function ChatPage() {
                   maxLength={2000}
                   placeholder="Type a message..."
                   enterKeyHint="send"
+                  name="message"
+                  autoComplete="off"
                   className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white/80 px-4 py-3 text-base outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/10 dark:border-slate-700 dark:bg-slate-900/60 dark:text-white sm:px-5 md:text-sm"
                 />
 
