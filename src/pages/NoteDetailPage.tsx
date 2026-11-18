@@ -326,12 +326,13 @@ export default function NoteDetailPage() {
             </p>
           )}
         </aside>
+        </div>
 
         {showPreview && user && note.file && (
           <section
             id="preview"
             aria-label="PDF preview"
-            className="glass min-w-0 scroll-mt-28 rounded-[2rem] p-4 sm:p-6 lg:col-span-3"
+            className="glass mt-6 min-w-0 scroll-mt-28 rounded-[2rem] p-4 sm:p-6"
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold tracking-tight">Preview</h2>
@@ -348,6 +349,5 @@ export default function NoteDetailPage() {
           </section>
         )}
       </div>
-    </div>
-  )
+    )
 }

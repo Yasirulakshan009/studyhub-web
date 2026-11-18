@@ -21,15 +21,15 @@ export default function MainLayout() {
     >
       <Background />
 
-      <div className="relative z-50 shrink-0">
+      <div className="fixed inset-x-0 top-0 z-[100]">
         <Header />
       </div>
 
       <main
         className={
           isChatPage
-            ? "relative z-10 min-h-0 flex-1 overflow-hidden px-3 pt-3 pb-24 md:pb-4 sm:px-4"
-            : "relative z-10 flex-1 px-4 py-8"
+            ? "relative z-10 min-h-0 flex-1 overflow-hidden px-3 pt-24 pb-24 md:pb-4 sm:px-4"
+            : "relative z-10 flex-1 px-4 pt-28 pb-8"
         }
       >
         <div

@@ -42,6 +42,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true)
   const [messagesLoading, setMessagesLoading] = useState(false)
   const [sending, setSending] = useState(false)
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [messageError, setMessageError] = useState("")
   const [returnToProfile, setReturnToProfile] = useState<string | null>(null)
@@ -184,6 +185,19 @@ export default function ChatPage() {
       fetchConversations()
     }
 
+    const handleDeletedMessage = (payload: {
+      conversationId: string
+      messageId: string
+    }) => {
+      if (payload.conversationId === selectedId) {
+        setMessages((current) =>
+          current.filter((message) => message._id !== payload.messageId)
+        )
+      }
+
+      fetchConversations()
+    }
+
     const joinConversation = () => {
       if (selectedId) {
         socket.emit("conversation:join", selectedId)
@@ -192,6 +206,7 @@ export default function ChatPage() {
 
     socket.on("message:new", handleNewMessage)
     socket.on("notification:new", handleNotification)
+    socket.on("message:deleted", handleDeletedMessage)
     socket.on("connect", joinConversation)
 
     if (socket.connected) {
@@ -205,6 +220,7 @@ export default function ChatPage() {
 
       socket.off("message:new", handleNewMessage)
       socket.off("notification:new", handleNotification)
+      socket.off("message:deleted", handleDeletedMessage)
       socket.off("connect", joinConversation)
       socket.disconnect()
       socketRef.current = null
@@ -254,6 +270,35 @@ export default function ChatPage() {
       )
     } finally {
       setSending(false)
+    }
+  }
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!selectedId || deletingMessageId) return
+
+    if (!window.confirm("Are you sure you want to delete this message?")) {
+      return
+    }
+
+    try {
+      setDeletingMessageId(messageId)
+      setMessageError("")
+
+      await api.delete(
+        `/chat/conversations/${selectedId}/messages/${messageId}`
+      )
+
+      setMessages((current) =>
+        current.filter((message) => message._id !== messageId)
+      )
+
+      fetchConversations()
+    } catch (err) {
+      setMessageError(
+        getErrorMessage(err, "Failed to delete message")
+      )
+    } finally {
+      setDeletingMessageId(null)
     }
   }
 
@@ -546,13 +591,28 @@ export default function ChatPage() {
                           <p className="whitespace-pre-wrap break-words text-sm leading-6">
                             {message.text}
                           </p>
-                          <div
-                            className={`mt-1.5 text-right text-[10px] ${
-                              isMine ? "text-white/70" : "text-slate-400"
-                            }`}
-                          >
-                            {formatTime(message.createdAt)}
-                            {isMine && message.readAt ? " · Read" : ""}
+                          <div className="mt-2 flex items-center justify-between gap-4">
+                            <div
+                              className={`text-[10px] ${
+                                isMine ? "text-white/70" : "text-slate-400"
+                              }`}
+                            >
+                              {formatTime(message.createdAt)}
+                              {isMine && message.readAt ? " · Read" : ""}
+                            </div>
+
+                            {isMine && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMessage(message._id)}
+                                disabled={deletingMessageId === message._id}
+                                className="text-[11px] font-semibold text-white/80 transition hover:text-white hover:underline disabled:opacity-50"
+                              >
+                                {deletingMessageId === message._id
+                                  ? "Deleting..."
+                                  : "Delete"}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
