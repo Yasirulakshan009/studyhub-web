@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
 import LoadingSpinner from "../components/common/LoadingSpinner"
 import EmptyState from "../components/common/EmptyState"
 import Pagination from "../components/common/Pagination"
@@ -15,6 +15,7 @@ const PAGE_SIZE = 12
 export default function PublicProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user: currentUser } = useAuth()
 
   const [profile, setProfile] = useState<PublicProfileResponse | null>(null)
@@ -104,7 +105,11 @@ export default function PublicProfilePage() {
       const conversationId = response.data.data._id
 
       navigate("/chat", {
-        state: { conversationId },
+        state: {
+          conversationId,
+          fromProfile: true,
+          returnTo: location.pathname,
+        },
       })
     } catch (err) {
       setError(getErrorMessage(err, "Could not start conversation."))

@@ -112,7 +112,7 @@ export default function Header() {
       <div className="relative mx-auto max-w-6xl">
         <nav
           aria-label="Main"
-          className="glass flex items-center justify-between rounded-full px-4 py-1"
+          className="glass flex items-center justify-between rounded-full px-4 py-2"
         >
           <Link
             to="/"
