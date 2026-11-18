@@ -11,7 +11,7 @@ export default function ChatFloatingButton() {
       aria-label="Open StudyHub messages"
       title="Messages"
       className="
-        fixed bottom-30 left-4 z-50
+        fixed bottom-28 left-4 z-50
         md:bottom-6 md:left-6
         flex h-[60px] w-[60px]
         items-center justify-center
