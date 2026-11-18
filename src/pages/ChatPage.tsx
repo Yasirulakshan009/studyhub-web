@@ -1,9 +1,10 @@
-
 import { useEffect, useRef, useState, type FormEvent } from "react"
+import { createPortal } from "react-dom"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import api, { getErrorMessage } from "../service/api"
 import { createChatSocket } from "../service/socket"
 import { useAuth } from "../hooks/useAuth"
+import { useMobileViewport } from "../hooks/useMobileViewport"
 import type { Socket } from "socket.io-client"
 
 interface ChatParticipant {
@@ -30,6 +31,12 @@ interface ChatMessage {
   readAt?: string | null
 }
 
+const avatarRing =
+  "border-2 border-brand/50 bg-sky-100 shadow-[0_4px_12px_rgb(10_132_255/0.25)] dark:border-sky-400/60 dark:bg-slate-700"
+
+const avatarFallback =
+  "bg-gradient-to-br from-white/90 via-sky-100/70 to-sky-300/50 font-bold text-brand dark:from-white/30 dark:via-sky-300/15 dark:to-sky-500/30 dark:text-white"
+
 export default function ChatPage() {
   const { user } = useAuth()
   const location = useLocation()
@@ -47,8 +54,16 @@ export default function ChatPage() {
   const [messageError, setMessageError] = useState("")
   const [returnToProfile, setReturnToProfile] = useState<string | null>(null)
 
+  const { isMobile, viewport } = useMobileViewport(selectedId !== null)
+  const fullScreen = isMobile && selectedId !== null
+
+  const keyboardOpen =
+    fullScreen && viewport !== null && window.innerHeight - viewport.height > 150
+
   const socketRef = useRef<Socket | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const [listHeight, setListHeight] = useState<number | null>(null)
 
   const selectedConversation = conversations.find(
     (conversation) => conversation._id === selectedId
@@ -73,6 +88,46 @@ export default function ChatPage() {
   useEffect(() => {
     fetchConversations()
   }, [])
+
+  // Open conversation on mobile: lock the page behind it so only the message list scrolls
+  useEffect(() => {
+    if (!fullScreen) return
+
+    const html = document.documentElement
+    const previousHtmlOverflow = html.style.overflow
+    const previousBodyOverflow = document.body.style.overflow
+
+    html.style.overflow = "hidden"
+    document.body.style.overflow = "hidden"
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow
+      document.body.style.overflow = previousBodyOverflow
+    }
+  }, [fullScreen])
+
+  // Mobile conversation list: fill the space between the box top and the bottom nav
+  useEffect(() => {
+    if (!isMobile || selectedId !== null) {
+      setListHeight(null)
+      return
+    }
+
+    const BOTTOM_NAV_SPACE = 96 // px: bottom nav + small gap
+
+    const measure = () => {
+      const element = rootRef.current
+      if (!element) return
+
+      const top = element.getBoundingClientRect().top + window.scrollY
+      setListHeight(Math.max(window.innerHeight - top - BOTTOM_NAV_SPACE, 320))
+    }
+
+    measure()
+    window.addEventListener("resize", measure)
+
+    return () => window.removeEventListener("resize", measure)
+  }, [isMobile, selectedId])
 
   useEffect(() => {
     const state = location.state as {
@@ -234,6 +289,11 @@ export default function ChatPage() {
     })
   }, [messages])
 
+  // Keyboard opened/closed: keep the latest message visible (like WhatsApp)
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: "end" })
+  }, [viewport?.height])
+
   const handleSendMessage = async (
     event: FormEvent<HTMLFormElement>
   ) => {
@@ -326,8 +386,29 @@ export default function ChatPage() {
     })
   }
 
-  return (
-    <div className="flex h-full min-h-0 flex-col">
+  const content = (
+    <div
+      ref={rootRef}
+      className={
+        fullScreen
+          ? "fixed inset-x-0 z-[1000] flex flex-col bg-[var(--page-bg)] px-2"
+          : "flex h-[calc(100dvh-12rem)] min-h-[20rem] flex-col md:h-full md:min-h-0"
+      }
+      style={
+        fullScreen
+          ? {
+              top: viewport?.top ?? 0,
+              height: viewport?.height ?? "100dvh",
+              paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+              paddingBottom: keyboardOpen
+                ? "0.5rem"
+                : "max(0.5rem, env(safe-area-inset-bottom))",
+            }
+          : isMobile && listHeight
+            ? { height: listHeight }
+            : undefined
+      }
+    >
       {returnToProfile && (
         <Link
           to={returnToProfile}
@@ -352,13 +433,15 @@ export default function ChatPage() {
           `}
         >
           <div className="flex shrink-0 items-center justify-between border-b border-slate-200/90 px-4 py-4 sm:px-5 dark:border-slate-700/90">
-            <div className="min-w-0">
-              <h2 className="text-lg font-bold">
-                Your conversations
-              </h2>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {conversations.length} conversations
-              </p>
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold">
+                  Your conversations
+                </h2>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {conversations.length} conversations
+                </p>
+              </div>
             </div>
 
             <span className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/10 text-lg">
@@ -443,10 +526,10 @@ export default function ChatPage() {
                         <img
                           src={participant.avatarUrl}
                           alt={participant.name}
-                          className="h-12 w-12 rounded-full border border-white/70 object-cover object-top shadow-sm dark:border-slate-600"
+                          className={`h-12 w-12 rounded-full object-cover object-top ${avatarRing}`}
                         />
                       ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 font-bold text-brand">
+                        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${avatarRing} ${avatarFallback}`}>
                           {participant.name.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -531,10 +614,10 @@ export default function ChatPage() {
                       <img
                         src={participant.avatarUrl}
                         alt={participant.name}
-                        className="h-11 w-11 shrink-0 rounded-full object-cover object-top"
+                        className={`h-11 w-11 shrink-0 rounded-full object-cover object-top ${avatarRing}`}
                       />
                     ) : (
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/10 font-bold text-brand">
+                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${avatarRing} ${avatarFallback}`}>
                         {participant?.name.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -639,7 +722,8 @@ export default function ChatPage() {
                   onChange={(event) => setNewMessage(event.target.value)}
                   maxLength={2000}
                   placeholder="Type a message..."
-                  className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white/80 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/10 dark:border-slate-700 dark:bg-slate-900/60 dark:text-white sm:px-5"
+                  enterKeyHint="send"
+                  className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white/80 px-4 py-3 text-base outline-none transition placeholder:text-slate-400 focus:border-brand focus:ring-2 focus:ring-brand/10 dark:border-slate-700 dark:bg-slate-900/60 dark:text-white sm:px-5 md:text-sm"
                 />
 
                 <button
@@ -657,4 +741,6 @@ export default function ChatPage() {
       </section>
     </div>
   )
+
+  return fullScreen ? createPortal(content, document.body) : content
 }
