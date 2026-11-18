@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import EmptyState from "../components/common/EmptyState"
@@ -290,17 +291,56 @@ export default function HomePage() {
               title: "Everyone learns",
               text: "Approved notes appear in search. Logged-in students can download them for free."
             }
-          ].map((item) => (
-            <div key={item.step} className="glass rounded-[1.75rem] p-6">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-lg font-semibold text-white shadow-lg shadow-brand/30">
+          ].map((item, index) => (
+            <div
+              key={item.step}
+              style={{ animationDelay: `${index * 180}ms` }}
+              className="glass group relative overflow-hidden rounded-[1.75rem] p-6
+                animate-[howCardEnter_700ms_cubic-bezier(0.22,1,0.36,1)_both]
+                transition-all duration-300 ease-out
+                hover:-translate-y-2 hover:scale-[1.02]
+                hover:border-brand/40
+                hover:shadow-[0_10px_25px_rgba(59,130,246,0.08)]
+                dark:hover:shadow-[0_10px_25px_rgba(59,130,246,0.06)]"
+            >
+              <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-brand/10 blur-3xl transition-all duration-500 group-hover:bg-brand/10 group-hover:scale-150" />
+
+              <div className="pointer-events-none absolute inset-0 rounded-[1.75rem] bg-gradient-to-br from-white/10 via-transparent to-brand/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+              <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-lg font-semibold text-white shadow-lg shadow-brand/30 transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-brand/50">
                 {item.step}
               </div>
-              <h3 className="mt-4 text-lg font-semibold tracking-tight">{item.title}</h3>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.text}</p>
+
+              <h3 className="relative mt-4 text-lg font-semibold tracking-tight transition-colors duration-300 group-hover:text-brand">
+                {item.title}
+              </h3>
+
+              <p className="relative mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {item.text}
+              </p>
             </div>
           ))}
         </div>
       </section>
+
+      <style>{`
+        @keyframes howCardEnter {
+          from {
+            opacity: 0;
+            transform: translateY(35px) scale(0.96);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .animate-\\[howCardEnter_700ms_cubic-bezier\\(0\\.22\\,1\\,0\\.36\\,1\\)_both\\] {
+            animation: none !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
